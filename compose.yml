@@ -16,7 +16,7 @@ services:
       - MONGO_LOG_DIR=/var/log/mongodb
       - MONGODB_USER="admin"
       - MONGODB_DATABASE:"test"
-      - MONGODB_PASS:"24101991"  
+      - MONGODB_PASS:"password"  
     restart: always
     command: [--auth]
     entrypoint: ["/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all", "--replSet", "rs0"]
@@ -49,7 +49,7 @@ services:
       - MONGO_LOG_DIR=/var/log/mongodb
       - MONGODB_USER="admin"
       - MONGODB_DATABASE:"test"
-      - MONGODB_PASS:"24101991"
+      - MONGODB_PASS:"password"
     restart: always
     command: [--auth]
     entrypoint: [ "/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all", "--replSet", "rs0"]
