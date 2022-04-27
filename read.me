@@ -1,0 +1,104 @@
+version: "3"
+services:
+   mongodb-mongosetup:
+    image: mongo:4.2
+    depends_on:
+      - mongodb1   
+    volumes:
+      - ./scripts:/scripts
+    restart: "no"
+    entrypoint: ["bash", "/scripts/mongo_setup.sh"]
+
+  mongodb1:
+    hostname: mongodb1
+    container_name: mongodb1
+    image: mongo:4.2
+    expose:
+      - 27017
+    ports:
+      - '27017:27017'
+    volumes:
+      - /data/mongodb/:/data/db
+      - /data/log/mongodb/:/var/log/mongodb
+      - /data/file.key:/data/file.key
+    environment:
+      - MONGO_LOG_DIR=/var/log/mongodb
+      - MONGODB_USER="admin"
+      - MONGODB_DATABASE:"test"
+      - MONGODB_PASS:"password"  
+    restart: always
+    command: [--auth]
+    entrypoint: ["/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all", "--replSet", "rs0"]
+
+  mongodb2:
+    hostname: mongodb2
+    container_name: mongodb2
+    image: mongo:4.2
+    expose:
+      - 27018
+    ports:
+      - '27018:27017'
+    volumes:
+      - /data2/mongodb:/data/db
+      - /data2/log/mongodb:/var/log/mongodb
+      - /data2/file.key:/data/file.key
+    environment:
+      - MONGO_LOG_DIR=/var/log/mongodb
+      - MONGODB_USER="admin"
+      - MONGODB_DATABASE:"test"
+      - MONGODB_PASS:"password"
+    restart: always
+    command: [--auth]
+    entrypoint: [ "/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all", "--replSet", "rs0"]
+
+
+use admin;
+   admin = db.getSiblingDB("admin");
+   admin.createUser(
+     {
+        user: "admin",
+        pwd: "password",
+        roles: [ { role: "root", db: "admin" } ]
+     });
+     db.getSiblingDB("admin").auth("admin", "password");
+     rs.status();
+
+
+
+ var cfg = {
+    "_id": "rs0",
+    "version": 1,
+    "members": [
+      {
+        "_id": 0,
+        "host": "192.168.1.254:27017",
+        "priority": 2
+      },
+      {
+        "_id": 1,
+        "host": "192.168.1.254:27018",
+        "priority": 1
+      }
+    ]
+  };
+  rs.initiate(cfg);
+
+
+use products
+db.createUser( { user: "accountAdmin01",
+                 pwd: passwordPrompt(),  // Or  "<cleartext password>"
+                 roles: [ { role: "clusterAdmin", db: "admin" },
+                          { role: "readAnyDatabase", db: "admin" },
+                          "readWrite", db: "mydb"] },
+               { w: "majority" , wtimeout: 5000 } )
+
+
+       
+
+use admin
+db.createUser({user: "mydb_owner", pwd: "mydb", roles:["dbOwner"]}) 
+
+
+
+mongo mongodb://mydb_owner:mydb@192.168.1.254:27017,192.168.1.254:27018/?replicaSet=rs0&&authSource=mydb
+

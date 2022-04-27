@@ -1,20 +1,20 @@
 #!/bin/bash
 echo "sleeping for 10 seconds"
-sleep 10
+sleep 30
 
-mongo <<EOF
+mongo  <<EOF
   var cfg = {
     "_id": "rs0",
     "version": 1,
     "members": [
       {
         "_id": 0,
-        "host": "192.168.1.15:27017",
+        "host": "192.168.1.254:27017",
         "priority": 2
       },
       {
         "_id": 1,
-        "host": "192.168.1.16:27017",
+        "host": "192.168.1.254:27018",
         "priority": 1
       }
     ]
@@ -24,7 +24,7 @@ EOF
 
 sleep 10
 
-mongo <<EOF
+mongo  <<EOF
    use admin;
    admin = db.getSiblingDB("admin");
    admin.createUser(

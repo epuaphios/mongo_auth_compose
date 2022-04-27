@@ -1,56 +1,51 @@
 version: "3"
 services:
-  mongodb1:
-    hostname: mongodb1
-    container_name: mongodb1
-    image: mongo:4.4.1-bionic
-    expose:
+   mongodb-mongosetup:
+     image: mongo:4.4
+     depends_on:
+       - mongodb1
+     network_mode: "host"     
+     volumes:
+       - ./scripts:/scripts
+     restart: "no"
+     entrypoint: ["bash", "/scripts/mongo_setup.sh"]
+    
+   mongodb1:
+     hostname: mongodb1
+     container_name: mongodb1
+     image: mongo:4.4
+     expose:
       - 27017
-    ports:
+     ports:
       - '27017:27017'
-    volumes:
-      - /data/mongodb/:/data/db
-      - /data/log/mongodb/:/var/log/mongodb
-      - /data/file.key:/data/file.key
-    environment:
-      - MONGO_LOG_DIR=/var/log/mongodb
-      - MONGODB_USER="admin"
-      - MONGODB_DATABASE:"test"
-      - MONGODB_PASS:"password"  
-    restart: always
-    command: [--auth]
-    entrypoint: ["/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all", "--replSet", "rs0"]
+     volumes:
+       - /data/mongodb/:/data/db
+       - /data/log/mongodb/:/var/log/mongodb
+       - /data/file.key:/data/file.key
+     environment:
+       - MONGO_LOG_DIR=/var/log/mongodb
+       - MONGO_INITDB_ROOT_USERNAME=admin
+       - MONGO_INITDB_ROOT_PASSWORD=password
+     restart: always
+     command: [--auth]
+     entrypoint: ["/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all", "--replSet", "rs0"]
 
-  mongodb-mongosetup:
-    image: mongo:4.4.1-bionic
-    depends_on:
-      - mongodb1
-    volumes:
-      - ./scripts:/scripts
-    restart: "no"
-    entrypoint: ["bash", "/scripts/mongo_setup.sh"]
-
-
-version: "3"
-services:
-  mongodb2:
-    hostname: mongodb2
-    container_name: mongodb2
-    image: mongo:4.4.1-bionic
-    expose:
-      - 27017
-    ports:
-      - '27017:27017'
-    volumes:
-      - /data/mongodb:/data/db
-      - /data/log/mongodb:/var/log/mongodb
-      - /data/file.key:/data/file.key
-    environment:
-      - MONGO_LOG_DIR=/var/log/mongodb
-      - MONGODB_USER="admin"
-      - MONGODB_DATABASE:"test"
-      - MONGODB_PASS:"password"
-    restart: always
-    command: [--auth]
-    entrypoint: [ "/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all", "--replSet", "rs0"]
-
+   mongodb2:
+     hostname: mongodb2
+     container_name: mongodb2
+     image: mongo:4.4
+     expose:
+       - 27018
+     ports:
+       - '27018:27017'
+     volumes:
+       - /data2/mongodb:/data/db
+       - /data2/log/mongodb:/var/log/mongodb
+       - /data2/file.key:/data/file.key
+     environment:
+       - MONGO_LOG_DIR=/var/log/mongodb
+       - MONGO_INITDB_ROOT_USERNAME=admin
+       - MONGO_INITDB_ROOT_PASSWORD=password
+     restart: always
+     command: [--auth]
+     entrypoint: [ "/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all", "--replSet", "rs0"]
