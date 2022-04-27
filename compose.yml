@@ -28,7 +28,7 @@ services:
        - MONGO_INITDB_ROOT_PASSWORD=password
      restart: always
      command: [--auth]
-     entrypoint: ["/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all", "--replSet", "rs0"]
+     entrypoint: ["/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all","--wiredTigerCacheSizeGB", "4", "--replSet", "rs0","--logpath", "/var/log/mongodb/mongo_1.log"]
 
    mongodb2:
      hostname: mongodb2
@@ -48,4 +48,4 @@ services:
        - MONGO_INITDB_ROOT_PASSWORD=password
      restart: always
      command: [--auth]
-     entrypoint: [ "/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all", "--replSet", "rs0"]
+     entrypoint: [ "/usr/bin/mongod", "--keyFile", "/data/file.key", "--bind_ip_all","--wiredTigerCacheSizeGB", "4","--replSet", "rs0","--logpath", "/var/log/mongodb/mongo2.log"]
